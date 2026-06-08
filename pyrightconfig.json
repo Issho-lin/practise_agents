@@ -1,0 +1,10 @@
+{
+  "reportAny": false,
+  "reportExplicitAny": false,
+  "reportMissingTypeStubs": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownArgumentType": false,
+  "reportUnusedCallResult": false,
+  "reportImplicitRelativeImport": false
+}

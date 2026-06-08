@@ -1,0 +1,39 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Backend API server for My Agents"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.7.0",
+    "langchain>=1.3.1",
+    "langgraph>=1.2.1",
+    "tavily>=1.1.0",
+    "langchain-openai>=1.2.2",
+    "serpapi>=1.0.2",
+    "ipykernel>=7.2.0",
+    "openai>=2.38.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.9.0",
+    "pytest>=8.3.0",
+    "httpx>=0.28.0",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.pyright]
+reportAny = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

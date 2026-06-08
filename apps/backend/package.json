@@ -1,0 +1,11 @@
+{
+  "name": "backend",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "uv run python -m app.run",
+    "lint": "uv run ruff check .",
+    "test": "uv run pytest",
+    "clean": "rm -rf .venv __pycache__ .ruff_cache"
+  }
+}
