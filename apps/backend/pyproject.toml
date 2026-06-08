@@ -16,6 +16,8 @@ dependencies = [
     "serpapi>=1.0.2",
     "ipykernel>=7.2.0",
     "openai>=2.38.0",
+    "autogen-agentchat>=0.7.5",
+    "autogen-ext[azure,openai]>=0.7.5",
 ]
 
 [dependency-groups]
