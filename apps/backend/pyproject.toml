@@ -19,6 +19,8 @@ dependencies = [
     "autogen-agentchat>=0.7.5",
     "autogen-ext[azure,openai]>=0.7.5",
     "agentscope>=2.0.1",
+    "colorama>=0.4.6",
+    "camel-ai>=0.2.90",
 ]
 
 [dependency-groups]
