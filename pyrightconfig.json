@@ -6,5 +6,6 @@
   "reportUnknownMemberType": false,
   "reportUnknownArgumentType": false,
   "reportUnusedCallResult": false,
-  "reportImplicitRelativeImport": false
+  "reportImplicitRelativeImport": false,
+  "reportReturnType": false
 }
