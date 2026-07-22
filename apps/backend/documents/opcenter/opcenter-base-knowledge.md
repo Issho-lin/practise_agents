@@ -25,17 +25,29 @@
 | `home` | 业绩预警看板（首页） | `/home` | 集团业绩概览，含多 Tab 视角 |
 | `opcenter` | 运营驾驶舱 | `/opcenter` | 含三个看板类型，可切换 |
 
-### 1.3 首页 Tab
+### 1.3 首页 Tab 与组织类型
 
-首页包含以下页面级 Tab：
+首页是唯一支持 `setOrg`（切换组织机构）的页面。组织分为两种类型，切换后 Tab 列表会动态变化：
+
+**集团组织（orgType=group）**：可选 Tab
 
 | Tab 名称 | 别名 | 说明 |
 |---|---|---|
-| 金地智慧服务整体 | — | 集团整体视角 |
-| 赛道 | — | 按业务赛道拆分 |
-| 区域公司（榜单） | 区域榜单 | 各区域公司排名 |
-| 经营画像 | 运营画像、画像 | 经营维度画像 |
-| 业绩看板 | — | 业绩数据看板 |
+| 金地智慧服务整体 | 集团整体、整体 | 集团考核指标达成进度，含指标/达成值/年度达成率/季度达成率/同比环比/月度趋势/门槛值/目标值/挑战值 |
+| 赛道 | 各赛道、赛道收入 | 按**基础赛道/战略赛道/增值业务**三个板块展示各赛道单位的业绩（收入和利润）预警情况，含指标/达成值/达成率/同比环比/月度趋势/排名 |
+| 区域公司（榜单） | 区域榜单、区域排名 | 各区域公司排名对比，含排名前三位/中间/后三位图例 |
+
+**区域组织（orgType=region）**：可选 Tab
+
+| Tab 名称 | 别名 | 说明 |
+|---|---|---|
+| 经营画像 | 运营画像、画像 | 区域公司多维经营画像，含绩效摘要（绩优/绩差指标）、雷达图（达成得分/均分/高分）、考核指标体检表 |
+| 业绩看板 | — | 区域公司业绩看板，含当前年/前一年对比数据及下月预测 |
+| 区域公司（榜单） | 区域榜单、区域排名 | 区域内排名对比 |
+
+> **注意**：集团组织下没有"经营画像"和"业绩看板"Tab；区域组织下没有"金地智慧服务整体"和"赛道"Tab。setPageTab 的 value 必须在当前 orgType 下的 Tab 列表中。
+
+涉及到指定组织机构的指令优先考虑首页，因为只有这个页面支持 `setOrg`。
 
 ---
 
@@ -147,9 +159,11 @@
 | 与目标比 | 1 | 按目标比、目标比 |
 | 与历史比 | 2 | 按历史比、历史比 |
 
-### 4.2 trackSelect — 赛道（select 类型）
+### 4.2 trackSelect — 赛道筛选（select 类型）
 
-仅规模看板（boardType=2）的下属可转化营收、下属新增签约模块使用。
+仅规模看板（boardType=2）的下属可转化营收、下属新增签约模块使用，用于在模块内按赛道筛选数据。
+
+> **消歧**：trackSelect 是模块内的赛道**筛选器**，不是看赛道收入概览的入口。用户想看"各赛道收入/利润"应去首页"赛道"Tab（见 1.3 节），而非来规模看板用 trackSelect。
 
 | label | value | 说明 |
 |---|---|---|
@@ -271,6 +285,7 @@
 
 - 格式：四位年份字符串 `yyyy`
 - 如用户说"26年"，应补全为"2026"
+- 首页和驾驶舱均使用，与 `setMonth` 配合设置年月
 
 ### 7.6 setMonth — 设置月份
 
@@ -278,8 +293,8 @@
 { "type": "setMonth", "value": 3, "rawValue": "3月" }
 ```
 
-- 取值：整数 `1..12`
-- 仅整体看板（boardType=1）和规模看板（boardType=2）支持
+- 取值：整数 `1..12`，需配合 `setYear` 使用
+- 仅首页、整体看板（boardType=1）和规模看板（boardType=2）支持
 - 对标看板（boardType=3）不支持，应使用对标周期代替
 
 ### 7.7 setStartYearPeriod — 对标周期起始年份（对标看板专用）
@@ -368,8 +383,8 @@
 | 6 | setSelect | setOrg, setPageTab | — |
 
 关键约束：
-- setOrg 执行后需等待 tabsReady（Tab 列表刷新完成）
-- setPageTab 依赖 setOrg（组织变了 Tab 可能变）
+- setOrg 执行后需等待 tabsReady（Tab 列表刷新完成，因为集团和区域组织的 Tab 列表不同）
+- setPageTab 依赖 setOrg（组织类型变了 Tab 也会变）
 - 模块动作依赖 setOrg 和 setPageTab
 
 ### 8.2 驾驶舱（opcenter）执行顺序
@@ -603,7 +618,7 @@
 {
   "rawText": "整体看板和规模看板有什么区别",
   "intentType": "chat",
-  "chatReply": "整体看板看的是经营全貌——营收、利润、现金流、可转化营收这些财务指标，分集团和下属两层视角。规模看板看的是量级——合约面积、在管面积、合管比这些规模指标，还能按住宅、商服、城服赛道拆分。简单说，整体看板看钱，规模看板看量。",
+  "chatReply": "整体看板看的是经营全貌——营收、利润、现金流、可转化营收这些财务指标，分集团和下属两层视角。规模看板看的是量级——合约面积、在管面积、合管比这些规模指标。简单说，整体看板看钱，规模看板看量。如果想看各赛道的收入和利润，可以去首页的赛道Tab。",
   "confidence": 0.92,
   "thinking": "用户想了解看板区别，用业务语言解释",
   "recommend": ["去整体看板", "去规模看板"],
@@ -726,3 +741,54 @@
 | 在管面积 | group-manage-area / benchmark.manage-area |
 | 收入排名 / 收入排行 | benchmark.revenue |
 | 利润排名 / 利润排行 | benchmark.net-profit |
+| 各赛道收入 / 赛道收入 / 赛道利润 | 首页"赛道"Tab（setPageTab，仅 orgType=group） |
+| 考核指标达成 / 集团考核指标 | 首页"金地智慧服务整体"Tab（setPageTab，仅 orgType=group） |
+| 经营画像 / 雷达图 / 绩优绩差指标 | 首页"经营画像"Tab（setPageTab，仅 orgType=region） |
+| 区域业绩 / 业绩看板 | 首页"业绩看板"Tab（setPageTab，仅 orgType=region） |
+| 区域排名 / 区域榜单 | 首页"区域公司（榜单）"Tab（setPageTab） |
+
+---
+
+## 十四、数据查看指南
+
+> 本节帮助智能体快速定位"想看某类数据时应该去哪个页面、哪个 Tab 或模块"。
+
+### 14.1 首页（业绩预警看板）可查看的数据
+
+| 想看的数据 | 前置条件 | 位置 | 动作 |
+|---|---|---|---|
+| 集团考核指标达成进度（指标/达成值/达成率/门槛值/目标值/挑战值/月度趋势/同比环比） | orgType=group | 金地智慧服务整体 Tab | `setPageTab: "金地智慧服务整体"` |
+| 基础赛道单位业绩预警（按条线拆分） | orgType=group | 赛道 Tab | `setPageTab: "赛道"` |
+| 战略赛道单位业绩预警 | orgType=group | 赛道 Tab | `setPageTab: "赛道"` |
+| 增值业务单位业绩预警 | orgType=group | 赛道 Tab | `setPageTab: "赛道"` |
+| 各区域公司排名对比 | — | 区域公司（榜单）Tab | `setPageTab: "区域公司（榜单）"` |
+| 经营画像（雷达图/绩优绩差指标/考核体检表） | orgType=region | 经营画像 Tab | `setPageTab: "经营画像"` |
+| 区域业绩看板（含当前年/前一年对比/下月预测） | orgType=region | 业绩看板 Tab | `setPageTab: "业绩看板"` |
+
+### 14.2 驾驶舱（opcenter）可查看的数据
+
+| 想看的数据 | 看板类型 | 模块 | 动作 |
+|---|---|---|---|
+| 集团营业收入 | 整体看板(1) | opcenter:group-revenue | `openModule` |
+| 集团税前利润 | 整体看板(1) | opcenter:group-profit | `openModule` |
+| 集团当年可转化营收 | 整体看板(1) | opcenter:group-convertible | `openModule` |
+| 集团新增签约饱和收入 | 整体看板(1) | opcenter:group-new-contract | `openModule` |
+| 产业单位营业收入 | 整体看板(1) | opcenter:group-industry-revenue | `openModule` |
+| 产业单位税前利润 | 整体看板(1) | opcenter:group-industry-profit | `openModule` |
+| 下属/区域公司营业收入 | 整体看板(1) | opcenter:branch-revenue | `openModule` + `setModuleTab` |
+| 下属/区域公司税前利润 | 整体看板(1) | opcenter:branch-profit | `openModule` + `setModuleTab` |
+| 经营性净现金流 | 整体看板(1) | opcenter:branch-cash-flow | `openModule` |
+| 下属当年可转化营收 | 整体看板(1) | opcenter:branch-convertible | `openModule` + `setModuleTab` |
+| 下属新增签约饱和收入 | 整体看板(1) | opcenter:branch-new-contract | `openModule` + `setModuleTab` |
+| 下属深耕城市浓度 | 整体看板(1) | opcenter:branch-deeply-cultivate | `openModule` |
+| 集团合约面积 | 规模看板(2) | mktdash:group-contract-area | `openModule` |
+| 集团在管面积 | 规模看板(2) | mktdash:group-manage-area | `openModule` |
+| 按赛道筛选可转化营收 | 规模看板(2) | mktdash:branch-convertible | `setModuleTab` + `setSelect` |
+| 按赛道筛选新增签约 | 规模看板(2) | mktdash:branch-new-contract | `setModuleTab` + `setSelect` |
+| 合管比 | 规模看板(2) | mktdash:branch-contract-to-managed-ratio | `openModule` |
+| 行业营收排名 | 对标看板(3) | benchmark.revenue | `openModule` |
+| 行业净利润排名 | 对标看板(3) | benchmark.net-profit | `openModule` |
+| 行业净利率 | 对标看板(3) | benchmark.net-profit-margin | `openModule` |
+| 行业毛利率 | 对标看板(3) | benchmark.gross-margin | `openModule` |
+| 行业在管面积排名 | 对标看板(3) | benchmark.manage-area | `openModule` |
+| 行业合约面积排名 | 对标看板(3) | benchmark.contract-area | `openModule` |
